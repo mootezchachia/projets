@@ -51,13 +51,7 @@ stages{
             }
         }
 	
-			stage("nexus") {
-            steps {
-                script {
-                    sh "mvn deploy"
-                }
-            }
-        }
+
 
         stage('Build docker image'){
             steps{
