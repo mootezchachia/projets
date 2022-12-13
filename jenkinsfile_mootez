@@ -43,7 +43,7 @@ stages{
         stage('nexus'){
             steps{
                 script{
-                    sh 'docker deploy'
+                    sh 'mvn deploy'
                 }
             }
         }
