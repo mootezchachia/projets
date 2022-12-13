@@ -1,0 +1,102 @@
+pipeline{
+
+      agent any
+        tools {
+     jdk 'JAVA_HOME'
+     maven 'M2_HOME'
+  }
+     
+stages{
+
+            stage('clean') {
+                steps {
+                    script {
+                        sh 'mvn clean'
+                            }
+                       }
+          }
+
+            stage('Test unitaires + mock') {
+                steps {
+                    script {
+                        sh 'mvn test'
+                            }
+                       }
+          }
+ 
+            stage('sonnarqube(qualite de code'){
+                steps{
+                      script{
+                 	      withSonarQubeEnv('sonar') {
+			              sh "mvn compile sonar:sonar"
+                       	     	}
+			             timeout(time: 1, unit: 'HOURS') {
+			               def qg = waitForQualityGate()
+				               if (qg.status != 'OK') {
+					               error "Pipeline aborted due to quality gate failure: ${qg.status}"
+				                }
+                    		}
+                 	}
+               	 }
+              }
+
+        stage('nexus'){
+            steps{
+                script{
+                    sh 'docker deploy'
+                }
+            }
+        }
+
+
+		stage("build jar") {
+            steps {
+                script {
+                    sh "mvn package -DskipTests=true"
+                }
+            }
+        }
+
+        stage('Build docker image'){
+            steps{
+                script{
+                    sh 'docker build -t mootezchachia1/devops .'
+                }
+            }
+        }
+	
+	
+	
+        stage('Push image to Hub'){
+            steps{
+                script{
+		        withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                   sh 'docker login -u mootezchachia1 -p Ricci007** docker.io'
+            }
+
+                   
+                }
+            }
+        }
+        stage("docker puch") {
+            steps {
+                script {
+                    sh 'docker push mootezchachia1/devops:latest'
+                }
+            }
+        }
+
+	      
+
+        
+        stage("docker up") {
+            steps {
+                script {
+                    sh 'docker-compose up -d --build'
+                }
+            }
+        }
+
+
+}
+}
