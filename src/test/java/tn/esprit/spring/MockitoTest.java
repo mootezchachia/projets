@@ -19,10 +19,10 @@ import static org.junit.Assert.assertNotNull;
 import static tn.esprit.spring.entities.Ville.RADES;
 import static tn.esprit.spring.entities.Ville.sfax;
 
-@RunWith(SpringRunner.class)
+/*@RunWith(SpringRunner.class)*/
 @SpringBootTest
 public class MockitoTest {
-
+/*
     @Mock
     VoyageRepository cp;
     @InjectMocks
@@ -41,6 +41,6 @@ public class MockitoTest {
         assertNotNull(s.getTrain());
 
 
-    }
+    }*/
     
 }
